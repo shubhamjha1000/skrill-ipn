@@ -6,55 +6,43 @@
  * Date: 06.12.2016
  * Time: 17:21
  * All rights and copyrights are owned by Sevio Solutions®
+ 
+ -----------------------------
+ UPDATE
+ -----------------------------
+ EDITED BY: SHREYANSH KASHYAP
+ EDITED ON: 15th DEC, 2020
+ EDITOR'S EMAIL: JHAJINAMASTE@GMAIL.COM
+ 
+ REASON FOR MODIFICATION: While integrating I found out some mistakes in the code which was needed to be corrected. It is now working great as of mentioned date above.
  */
 
-define("MD5_VALUE", "thesecretword");
+define("SKRILL_SECRET_WORD", strtoupper(md5("skrill")));
 
 $transactionPayEmail = $_POST['pay_to_email'];
 $transactionPayFromEmail = $_POST['pay_from_email'];
 $transactionMerchantId = $_POST['merchant_id'];
-$transactionMbTransactionId = $_POST['mb_transaction_id'];
-$transactionMAmount = $_POST['mb_amount'];
+$transactionMbtxn_id = $_POST['mb_transaction_id'];
+$transactionMbAmount = $_POST['mb_amount'];
 $transactionMbCurrency = $_POST['mb_currency'];
 $transactionStatus = $_POST['status'];
 $transactionMd5sig = $_POST['md5sig'];
-$transactionAmount = $_POST['amount'];
-$transactionCurrency = $_POST['currency'];
 
+// Following details are the original details submitted using the form
+$amount = $_POST['amount'];
+$currency_code = $_POST['currency'];
+$userId = $_POST['Field1'];
+$txn_id = $_POST['transaction_id'];
 
-if (isset($_POST['customer_id']))
-    $transactionCustomerId = $_POST['customer_id'];
+$md5signature = $transactionMerchantId . $txn_id . SKRILL_SECRET_WORD . $transactionMbAmount . $transactionMbCurrency . $transactionStatus;
 
-if (isset($_POST['transaction_id']))
-    $transactionId = $_POST['transaction_id'];
-else
-    $transactionId = '';
-
-if (isset($_POST['failed_reason_code']))
-    $transactionFailedReasonCode = $_POST['failed_reason_code'];
-
-if (isset($_POST['sha2sig']))
-    $transactionSha2sig = $_POST['sha2sig'];
-
-if (isset($_POST['neteller_id']))
-    $transactionNetellerId = $_POST['neteller_id'];
-
-if (isset($_POST['payment_type']))
-    $transactionPaymentType = $_POST['payment_type'];
-
-
-if (isset($_POST['merchant_fields']))
-    $transactionMerchantFields = $_POST['merchant_fields'];
-
-
-$md5signature = $transactionMerchantId . $transactionId . strtoupper(MD5_VALUE) . $transactionMAmount . $transactionMbCurrency . $transactionStatus;
-
-if ($md5signature == $transactionMd5sig)
-    if ($transactionStatus == 2) {
-        // Transaction is processed, do whatever you want with the given information
-    } else {
-        // Transaction is not complete, do whatever you want with the given information
-    }
-else {
-    //Signature mismatch
+if(strtoupper(md5($md5signature)) == $transactionMd5sig){
+  if($transactionStatus == 2){
+    // Transaction successful. You may now update the database.
+  }else{
+    // Transaction is unsuccessful. You may log the details.
+  }
+}else{
+  // Verification Signature Mismatch!
 }
+?>
